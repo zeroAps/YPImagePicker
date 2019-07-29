@@ -225,6 +225,8 @@ public class YPLibraryVC: UIViewController, YPPermissionCheckable {
                     block(s == .authorized)
                 }
             }
+        @unknown default:
+            break
         }
     }
     
@@ -302,6 +304,8 @@ public class YPLibraryVC: UIViewController, YPPermissionCheckable {
                                                   storedCropPosition: self.fetchStoredCrop(),
                                                   completion: completion)
             case .audio, .unknown:
+                ()
+            @unknown default:
                 ()
             }
         }
@@ -468,7 +472,8 @@ public class YPLibraryVC: UIViewController, YPPermissionCheckable {
                         }
                     }
                 case .audio, .unknown:
-                    return
+                    return;
+                @unknown default: break                    
                 }
             }
         }

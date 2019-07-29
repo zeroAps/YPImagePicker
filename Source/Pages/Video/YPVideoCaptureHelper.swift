@@ -62,7 +62,10 @@ class YPVideoCaptureHelper: NSObject {
                     self?.session.startRunning()
                     completion()
                     self?.tryToSetupPreview()
+                @unknown default:
+                    return
                 }
+                
             }
         }
     }

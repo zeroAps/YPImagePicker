@@ -65,7 +65,7 @@ extension YPPhotoCapture {
                     completion()
                     self?.tryToSetupPreview()
                 @unknown default:
-                    break
+                    fatalError()
                 }
             }
         }

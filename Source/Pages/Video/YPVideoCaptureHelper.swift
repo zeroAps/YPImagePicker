@@ -63,7 +63,7 @@ class YPVideoCaptureHelper: NSObject {
                     completion()
                     self?.tryToSetupPreview()
                 @unknown default:
-                    return
+                    fatalError()
                 }
                 
             }

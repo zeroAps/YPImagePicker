@@ -142,12 +142,12 @@ open class YPPickerVC: YPBottomPager, YPBottomPagerDelegate {
     
     func modeFor(vc: UIViewController) -> Mode {
         switch vc {
-        case is YPLibraryVC:
-            return .library
         case is YPCameraVC:
             return .camera
         case is YPVideoCaptureVC:
             return .video
+        case is YPLibraryVC:
+            return .library
         default:
             return .camera
         }

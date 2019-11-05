@@ -69,24 +69,28 @@ class YPVideoProcessor {
         // input clip
         let clipVideoTrack = asset.tracks(withMediaType: .video)[0]
         
-        // make it square
         let videoComposition = AVMutableVideoComposition()
-        videoComposition.renderSize = CGSize(width: CGFloat(clipVideoTrack.naturalSize.height), height: CGFloat(clipVideoTrack.naturalSize.height))
         videoComposition.frameDuration = CMTimeMake(value: 1, timescale: 30)
-        let instruction = AVMutableVideoCompositionInstruction()
-        instruction.timeRange = CMTimeRangeMake(start: CMTime.zero, duration: CMTimeMakeWithSeconds(60, preferredTimescale: 30))
+        videoComposition.renderSize = CGSize(width: CGFloat(clipVideoTrack.naturalSize.height), height: CGFloat(clipVideoTrack.naturalSize.height))
         
-        // rotate to potrait
-        let transformer = AVMutableVideoCompositionLayerInstruction(assetTrack: clipVideoTrack)
-        let t1 = CGAffineTransform(translationX: clipVideoTrack.naturalSize.height, y: -(clipVideoTrack.naturalSize.width - clipVideoTrack.naturalSize.height) / 2)
-        let t2: CGAffineTransform = t1.rotated(by: .pi/2)
-        let finalTransform: CGAffineTransform = t2
-        transformer.setTransform(finalTransform, at: CMTime.zero)
-        instruction.layerInstructions = [transformer]
-        videoComposition.instructions = [instruction]
+        // make it square
+//        let videoComposition = AVMutableVideoComposition()
+//        videoComposition.renderSize = CGSize(width: CGFloat(clipVideoTrack.naturalSize.height), height: CGFloat(clipVideoTrack.naturalSize.height))
+//        videoComposition.frameDuration = CMTimeMake(value: 1, timescale: 30)
+//        let instruction = AVMutableVideoCompositionInstruction()
+//        instruction.timeRange = CMTimeRangeMake(start: CMTime.zero, duration: CMTimeMakeWithSeconds(60, preferredTimescale: 30))
+//
+//        // rotate to potrait
+//        let transformer = AVMutableVideoCompositionLayerInstruction(assetTrack: clipVideoTrack)
+//        let t1 = CGAffineTransform(translationX: clipVideoTrack.naturalSize.height, y: -(clipVideoTrack.naturalSize.width - clipVideoTrack.naturalSize.height) / 2)
+//        let t2: CGAffineTransform = t1.rotated(by: .pi/2)
+//        let finalTransform: CGAffineTransform = t2
+//        transformer.setTransform(finalTransform, at: CMTime.zero)
+//        instruction.layerInstructions = [transformer]
+//        videoComposition.instructions = [instruction]
         
         // exporter
-        let exporter = AVAssetExportSession.init(asset: asset, presetName: YPConfig.video.compression)
+        let exporter = AVAssetExportSession.init(asset: asset, presetName: AVAssetExportPresetMediumQuality)
         exporter?.videoComposition = videoComposition
         exporter?.outputURL = outputPath
         exporter?.shouldOptimizeForNetworkUse = true

@@ -73,6 +73,18 @@ class YPVideoProcessor {
         videoComposition.frameDuration = CMTimeMake(value: 1, timescale: 30)
         videoComposition.renderSize = CGSize(width: CGFloat(clipVideoTrack.naturalSize.height), height: CGFloat(clipVideoTrack.naturalSize.height))
         
+        let instruction = AVMutableVideoCompositionInstruction()
+        instruction.timeRange = CMTimeRangeMake(start: CMTime.zero, duration: asset.duration)
+
+        let transformer = AVMutableVideoCompositionLayerInstruction(assetTrack: clipVideoTrack)
+        let t1 = CGAffineTransform(translationX: clipVideoTrack.naturalSize.height, y: 0)
+        let t2 = t1.rotated(by: .pi / 2)
+
+        let finalTransform = t2
+        transformer.setTransform(finalTransform, at: CMTime.zero)
+        instruction.layerInstructions = [transformer]
+        videoComposition.instructions = [instruction]
+        
         // make it square
 //        let videoComposition = AVMutableVideoComposition()
 //        videoComposition.renderSize = CGSize(width: CGFloat(clipVideoTrack.naturalSize.height), height: CGFloat(clipVideoTrack.naturalSize.height))

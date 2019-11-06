@@ -76,12 +76,12 @@ extension YPSelectionsGalleryVC: UICollectionViewDataSource {
         }
         let item = items[indexPath.row]
         switch item {
-        case .video(let video):
-            cell.imageView.image = video.thumbnail
-            cell.setEditable(YPConfig.showsVideoTrimmer)
         case .photo(let photo):
             cell.imageView.image = photo.image
             cell.setEditable(YPConfig.showsPhotoFilters)
+        case .video(let video):
+            cell.imageView.image = video.thumbnail
+            cell.setEditable(YPConfig.showsVideoTrimmer)
         }        
         return cell
     }
@@ -93,14 +93,14 @@ extension YPSelectionsGalleryVC: UICollectionViewDelegate {
         let item = items[indexPath.row]
         var mediaFilterVC: IsMediaFilterVC?
         switch item {
-        case .video(let video):
-            if YPConfig.showsVideoTrimmer {
-                mediaFilterVC = YPVideoFiltersVC.initWith(video: video, isFromSelectionVC: true)
-            }
         case .photo(let photo):
             if !YPConfig.filters.isEmpty, YPConfig.showsPhotoFilters {
                 mediaFilterVC = YPPhotoFiltersVC(inputPhoto: photo, isFromSelectionVC: true)
             }
+        case .video(let video):
+            if YPConfig.showsVideoTrimmer {
+                mediaFilterVC = YPVideoFiltersVC.initWith(video: video, isFromSelectionVC: true)
+            }        
         }
         
         mediaFilterVC?.didSave = { outputMedia in

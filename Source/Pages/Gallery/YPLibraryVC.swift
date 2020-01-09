@@ -312,28 +312,36 @@ public class YPLibraryVC: UIViewController, YPPermissionCheckable {
     
     func changeAsset(_ asset: PHAsset) {
         latestImageTapped = asset.localIdentifier
-        delegate?.libraryViewStartedLoading()
+        delegate?.libraryViewStartedLoadingImage()
         
-        let completion = {
-            self.v.hideLoader()
+        let completion = { (isLowResIntermediaryImage: Bool) in
             self.v.hideGrid()
-            self.delegate?.libraryViewFinishedLoading()
             self.v.assetViewContainer.refreshSquareCropButton()
             self.updateCropInfo()
+            if !isLowResIntermediaryImage {
+                self.v.hideLoader()
+                self.delegate?.libraryViewFinishedLoading()
+            }
         }
         
+        let updateCropInfo = {
+            self.updateCropInfo()
+        }
+        //MARK: add a func(updateCropInfo) after crop multiple
         DispatchQueue.global(qos: .userInitiated).async {
             switch asset.mediaType {
             case .image:
                 self.v.assetZoomableView.setImage(asset,
                                                   mediaManager: self.mediaManager,
                                                   storedCropPosition: self.fetchStoredCrop(),
-                                                  completion: completion)
+                                                  completion: completion,
+                                                  updateCropInfo: updateCropInfo)
             case .video:
                 self.v.assetZoomableView.setVideo(asset,
                                                   mediaManager: self.mediaManager,
                                                   storedCropPosition: self.fetchStoredCrop(),
-                                                  completion: completion)
+                                                  completion: { completion(false) },
+                                                  updateCropInfo: updateCropInfo)
             case .audio, .unknown:
                 ()
             @unknown default:
@@ -349,8 +357,8 @@ public class YPLibraryVC: UIViewController, YPPermissionCheckable {
             return true
         }
         
-        let tooLong = asset.duration > YPConfig.video.libraryTimeLimit
-        let tooShort = asset.duration < YPConfig.video.minimumTimeLimit
+        let tooLong = floor(asset.duration) > YPConfig.video.libraryTimeLimit
+        let tooShort = floor(asset.duration) < YPConfig.video.minimumTimeLimit
         
         if tooLong || tooShort {
             DispatchQueue.main.async {
@@ -406,7 +414,7 @@ public class YPLibraryVC: UIViewController, YPPermissionCheckable {
     private func fetchImageAndCrop(for asset: PHAsset,
                                    withCropRect: CGRect? = nil,
                                    callback: @escaping (_ photo: UIImage, _ exif: [String : Any]) -> Void) {
-        delegate?.libraryViewStartedLoading()
+        delegate?.libraryViewDidTapNext()
         let cropRect = withCropRect ?? DispatchQueue.main.sync { v.currentCropRect() }
         let ts = targetSize(for: asset, cropRect: cropRect)
         mediaManager.imageManager?.fetchImage(for: asset, cropRect: cropRect, targetSize: ts, callback: callback)
@@ -416,7 +424,7 @@ public class YPLibraryVC: UIViewController, YPPermissionCheckable {
                                          withCropRect: CGRect? = nil,
                                          callback: @escaping (_ videoURL: URL) -> Void) {
         if fitsVideoLengthLimits(asset: asset) == true {
-            delegate?.libraryViewStartedLoading()
+            delegate?.libraryViewDidTapNext()
             let normalizedCropRect = withCropRect ?? DispatchQueue.main.sync { v.currentCropRect() }
             let ts = targetSize(for: asset, cropRect: normalizedCropRect)
             let xCrop: CGFloat = normalizedCropRect.origin.x * CGFloat(asset.pixelWidth)
@@ -507,6 +515,7 @@ public class YPLibraryVC: UIViewController, YPPermissionCheckable {
                 @unknown default:
                     fatalError()
                 }
+                return
             }
         }
     }

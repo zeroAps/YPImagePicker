@@ -8,7 +8,9 @@
 
 import UIKit
 
-public class YPSelectionsGalleryVC: UIViewController {
+public class YPSelectionsGalleryVC: UIViewController, YPSelectionsGalleryCellDelegate {
+    
+    override public var prefersStatusBarHidden: Bool { return YPConfig.hidesStatusBar }
     
     public var items: [YPMediaItem] = []
     public var didFinishHandler: ((_ gallery: YPSelectionsGalleryVC, _ items: [YPMediaItem]) -> Void)?
@@ -60,6 +62,15 @@ public class YPSelectionsGalleryVC: UIViewController {
         }
         didFinishHandler?(self, items)
     }
+    
+    public func selectionsGalleryCellDidTapRemove(cell: YPSelectionsGalleryCell) {
+        if let indexPath = v.collectionView.indexPath(for: cell) {
+            items.remove(at: indexPath.row)
+            v.collectionView.performBatchUpdates({
+                v.collectionView.deleteItems(at: [indexPath])
+            }, completion: { _ in })
+        }
+    }
 }
 
 // MARK: - Collection View
@@ -74,6 +85,7 @@ extension YPSelectionsGalleryVC: UICollectionViewDataSource {
                                                             for: indexPath) as? YPSelectionsGalleryCell else {
             return UICollectionViewCell()
         }
+        cell.delegate = self
         let item = items[indexPath.row]
         switch item {
         case .photo(let photo):
@@ -82,7 +94,8 @@ extension YPSelectionsGalleryVC: UICollectionViewDataSource {
         case .video(let video):
             cell.imageView.image = video.thumbnail
             cell.setEditable(YPConfig.showsVideoTrimmer)
-        }        
+        }
+        cell.removeButton.isHidden = YPConfig.gallery.hidesRemoveButton
         return cell
     }
 }

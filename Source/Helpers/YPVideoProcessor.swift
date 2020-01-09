@@ -70,8 +70,14 @@ class YPVideoProcessor {
         let clipVideoTrack = asset.tracks(withMediaType: .video)[0]
         
         let videoComposition = AVMutableVideoComposition()
+        if YPConfig.onlySquareImagesFromCamera {
+            videoComposition.renderSize = CGSize(width: CGFloat(clipVideoTrack.naturalSize.height), height: CGFloat(clipVideoTrack.naturalSize.height))
+        } else {
+            videoComposition.renderSize = CGSize(width: CGFloat(clipVideoTrack.naturalSize.height), height: CGFloat(clipVideoTrack.naturalSize.width))
+        }
         videoComposition.frameDuration = CMTimeMake(value: 1, timescale: 30)
-        videoComposition.renderSize = CGSize(width: CGFloat(clipVideoTrack.naturalSize.height), height: CGFloat(clipVideoTrack.naturalSize.height))
+        let instruction = AVMutableVideoCompositionInstruction()
+        instruction.timeRange = CMTimeRangeMake(start: CMTime.zero, duration: asset.duration)
         
         let instruction = AVMutableVideoCompositionInstruction()
         instruction.timeRange = CMTimeRangeMake(start: CMTime.zero, duration: asset.duration)

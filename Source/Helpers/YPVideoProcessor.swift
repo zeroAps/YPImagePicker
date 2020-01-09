@@ -78,9 +78,6 @@ class YPVideoProcessor {
         videoComposition.frameDuration = CMTimeMake(value: 1, timescale: 30)
         let instruction = AVMutableVideoCompositionInstruction()
         instruction.timeRange = CMTimeRangeMake(start: CMTime.zero, duration: asset.duration)
-        
-        let instruction = AVMutableVideoCompositionInstruction()
-        instruction.timeRange = CMTimeRangeMake(start: CMTime.zero, duration: asset.duration)
 
         let transformer = AVMutableVideoCompositionLayerInstruction(assetTrack: clipVideoTrack)
         let t1 = CGAffineTransform(translationX: clipVideoTrack.naturalSize.height, y: 0)

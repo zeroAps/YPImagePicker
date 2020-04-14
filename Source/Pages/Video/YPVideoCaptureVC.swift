@@ -278,7 +278,8 @@ public class YPVideoCaptureVC: UIViewController, YPPermissionCheckable {
         if let progress = notification.object as? Float {
             self.progressView?.progress = progress
             
-            if let progress = Double(String(format: "%.2f", progress)), progress > 0.97 {
+            let p = String(format: "%.2f", progress)
+            if let progress = Double(p), progress > 0.97 {
                 alert.dismiss(animated: false, completion: nil)
             }
         }

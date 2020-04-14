@@ -52,6 +52,9 @@ class YPVideoProcessor {
      Crops the video to square by video height from the top of the video.
      */
     static func cropToSquare(filePath: URL, completion: @escaping (_ outputURL : URL?) -> ()) {
+        
+        var exportProgressBarTimer = Timer()
+        
         // output file
         let outputPath = makeVideoPathURL(temporaryFolder: true, fileName: "squaredVideoFromCamera")
         

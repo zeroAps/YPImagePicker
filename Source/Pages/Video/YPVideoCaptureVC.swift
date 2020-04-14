@@ -16,6 +16,10 @@ public class YPVideoCaptureVC: UIViewController, YPPermissionCheckable {
     private let v = YPCameraView(overlayView: nil)
     private var viewState = ViewState()
     
+    let alert = UIAlertController(title: nil, message: "Compressing! Please wait!", preferredStyle: .alert)
+    var progress: Float?
+    var progressView: UIProgressView?
+    
     // MARK: - Init
     
     public required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
@@ -26,6 +30,7 @@ public class YPVideoCaptureVC: UIViewController, YPPermissionCheckable {
         videoHelper.didCaptureVideo = { [weak self] videoURL in
             self?.didCaptureVideo?(videoURL)
             self?.resetVisualState()
+            self?.dismiss(animated: false, completion: nil)
         }
         videoHelper.videoRecordingProgress = { [weak self] progress, timeElapsed in
             self?.updateState {
@@ -52,6 +57,13 @@ public class YPVideoCaptureVC: UIViewController, YPPermissionCheckable {
         // Zoom
         let pinchRecongizer = UIPinchGestureRecognizer(target: self, action: #selector(self.pinch(_:)))
         v.previewViewContainer.addGestureRecognizer(pinchRecongizer)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.uploadDidProgress(_:)), name: NSNotification.Name(rawValue: "ProgressBarPercentage"), object: nil)
+    }
+    
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        NotificationCenter.default.removeObserver(self)
     }
 
     func start() {
@@ -145,6 +157,18 @@ public class YPVideoCaptureVC: UIViewController, YPPermissionCheckable {
         updateState {
             $0.isRecording = false
         }
+        
+        let height:NSLayoutConstraint = NSLayoutConstraint(item: alert.view!, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant:120)
+        alert.view.addConstraint(height);
+        
+        present(alert, animated: true, completion: {
+            //  Add your progressbar after alert is shown (and measured)
+            let margin:CGFloat = 8.0
+            let rect = CGRect(x: margin, y: 72.0, width: self.alert.view.frame.width - margin * 2.0 , height: 5.0)
+            self.progressView = UIProgressView(frame: rect)
+            self.progressView?.tintColor = self.view.tintColor
+            self.alert.view.addSubview(self.progressView!)
+        })
     }
 
     public func stopCamera() {
@@ -247,6 +271,16 @@ public class YPVideoCaptureVC: UIViewController, YPPermissionCheckable {
             }
         } else {
             return .noFlash
+        }
+    }
+    
+    @objc private func uploadDidProgress(_ notification: Notification) {
+        if let progress = notification.object as? Float {
+            self.progressView?.progress = progress
+            
+            if let progress = Double(String(format: "%.2f", progress)), progress > 0.97 {
+                alert.dismiss(animated: false, completion: nil)
+            }
         }
     }
 }

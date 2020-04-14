@@ -92,6 +92,17 @@ class YPVideoProcessor {
         exporter?.outputURL = outputPath
         exporter?.shouldOptimizeForNetworkUse = true
         exporter?.outputFileType = YPConfig.video.fileType
+        
+        if #available(iOS 10.0, *) {
+            exportProgressBarTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
+            let progress = Float((exporter?.progress)!)
+            if (progress < 0.99) {
+               NotificationCenter.default.post(name: Notification.Name("ProgressBarPercentage"), object: Float(progress))
+            } else {
+                exportProgressBarTimer.invalidate()
+            }
+          }
+        }
 
         exporter?.exportAsynchronously {
             if exporter?.status == .completed {

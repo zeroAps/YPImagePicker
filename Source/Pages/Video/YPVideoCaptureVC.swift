@@ -16,7 +16,7 @@ public class YPVideoCaptureVC: UIViewController, YPPermissionCheckable {
     private let v = YPCameraView(overlayView: nil)
     private var viewState = ViewState()
     
-    let alert = UIAlertController(title: nil, message: "Compressing! Please wait!", preferredStyle: .alert)
+    let alert = UIAlertController(title: nil, message: "Compressing, please wait...", preferredStyle: .alert)
     var progress: Float?
     var progressView: UIProgressView?
     
@@ -279,7 +279,7 @@ public class YPVideoCaptureVC: UIViewController, YPPermissionCheckable {
             self.progressView?.progress = progress
             
             let p = String(format: "%.2f", progress)
-            if let progress = Double(p), progress > 0.97 {
+            if let progress = Double(p), progress > 0.99 {
                 alert.dismiss(animated: false, completion: nil)
             }
         }
